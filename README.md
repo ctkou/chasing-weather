@@ -1,10 +1,18 @@
 # chasing-weather-api
 
-## Local development setup
+## Deployment
 
-### Prerequisites
+Source -> sam build -> sam package -> same deploy
 
-1. Install aws cli (see https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-2. Install aws-sam-cli (see https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-3. Configure aws cli access credential (see https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-set-up-credentials.html)
+```bash
+sam build
+```
 
+```bash
+sam package --s3-bucket [s3-bucket-name] --output-template-file output.yaml
+```
+
+first time deployment
+```bash
+sam deploy --template-file output.yaml --stack-name [stack-name] --capabilities CAPABILITY_IAM
+```
