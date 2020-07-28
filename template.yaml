@@ -27,6 +27,9 @@ Resources:
           Properties:
             Path: /weather
             Method: get
+            RequestParameters:
+              - method.request.querystring.lat
+              - method.request.querystring.lon
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
