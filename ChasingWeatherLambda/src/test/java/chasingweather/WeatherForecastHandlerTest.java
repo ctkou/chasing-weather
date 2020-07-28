@@ -6,11 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-public class AppTest {
+public class WeatherForecastHandlerTest {
   @Test
   public void successfulResponse() {
-    App app = new App();
-    APIGatewayProxyResponseEvent result = app.handleRequest(null, null);
+    WeatherForecastHandler weatherForecastHandler = new WeatherForecastHandler();
+    APIGatewayProxyResponseEvent result = weatherForecastHandler.handleRequest(null, null);
     assertEquals(result.getStatusCode().intValue(), 200);
     assertEquals(result.getHeaders().get("Content-Type"), "application/json");
     String content = result.getBody();

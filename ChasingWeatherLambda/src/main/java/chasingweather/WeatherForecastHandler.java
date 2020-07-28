@@ -19,7 +19,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
  * Handler for requests to Lambda function.
  */
 @Slf4j
-public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class WeatherForecastHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input, final Context context) {
         Map<String, String> headers = new HashMap<>();
