@@ -5,11 +5,14 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import handler.WeatherForecastHandler;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -19,7 +22,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class WeatherForecastHandlerTest {
+public class WeatherForecastRequestHandlerTest {
 
     private static ObjectMapper MAPPER = new ObjectMapper();
     private static Map<String, String> QUERY_PARAMETERS = new HashMap<>();
@@ -31,6 +34,12 @@ public class WeatherForecastHandlerTest {
     @Mock
     private APIGatewayProxyRequestEvent input;
 
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    @InjectMocks
+    private WeatherForecastHandler weatherForecastHandler;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -39,7 +48,6 @@ public class WeatherForecastHandlerTest {
 
     @Test
     public void successfulResponse() throws JsonProcessingException {
-        WeatherForecastHandler weatherForecastHandler = new WeatherForecastHandler();
         APIGatewayProxyResponseEvent result = weatherForecastHandler.handleRequest(input, null);
         assertEquals(result.getStatusCode().intValue(), Response.Status.OK.getStatusCode());
         assertEquals(result.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
