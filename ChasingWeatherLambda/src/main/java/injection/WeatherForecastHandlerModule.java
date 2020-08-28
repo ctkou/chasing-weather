@@ -1,16 +1,20 @@
 package injection;
 
+import client.OpenWeatherClient;
+import client.WeatherForecastClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dagger.Module;
 import dagger.Provides;
 
-import javax.inject.Singleton;
-
 @Module
 public class WeatherForecastHandlerModule {
-    @Singleton
     @Provides
     public ObjectMapper provideObjectMapper() {
         return new ObjectMapper();
+    }
+
+    @Provides
+    public WeatherForecastClient provideWeatherForecastClient() {
+        return new OpenWeatherClient();
     }
 }
