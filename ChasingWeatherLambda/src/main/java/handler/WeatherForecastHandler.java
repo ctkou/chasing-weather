@@ -6,8 +6,11 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import exception.LambdaException;
+import exception.QueryParameterException;
 import lombok.extern.slf4j.Slf4j;
 import model.Location;
+import org.apache.commons.math3.util.Precision;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
@@ -18,6 +21,8 @@ import java.util.Map;
 
 @Slf4j
 public class WeatherForecastHandler {
+
+    private static final int LOCATION_DECIMAL_PLACE = 1;
 
     private final ObjectMapper objectMapper;
 
@@ -31,25 +36,33 @@ public class WeatherForecastHandler {
 
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input, final Context context) {
         APIGatewayProxyResponseEvent response = initializeAPIGatewayProxyResponse();
-
-        // TODO: handle missing lat, lon query parameters
-        Location location = getLocation(input);
-
         try {
+            Location location = getLocation(input);
             return response
                     .withStatusCode(Response.Status.OK.getStatusCode())
                     .withBody(objectMapper.writeValueAsString(weatherClient.getWeatherForecastByLocation(location)));
-        } catch (JsonProcessingException e) {
+        } catch (LambdaException e) {
+            log.error(e.getMessage(), e);
             return response
                     .withStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                    .withBody("{}");
+                    .withBody(e.getErrorMessageJsonString());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return response
+                    .withStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withBody("{\"message\":\"Unexpected error.\"}");
         }
     }
 
     private Location getLocation(APIGatewayProxyRequestEvent requestEvent) {
+        if (requestEvent.getQueryStringParameters() == null || requestEvent.getQueryStringParameters().isEmpty()) {
+            throw new QueryParameterException();
+        }
         double latitude = Double.parseDouble(requestEvent.getQueryStringParameters().get("lat"));
         double longitude = Double.parseDouble(requestEvent.getQueryStringParameters().get("lon"));
-        return Location.builder().latitude(latitude).longitude(longitude).build();
+        return Location.builder()
+                .latitude(Precision.round(latitude, LOCATION_DECIMAL_PLACE))
+                .longitude(Precision.round(longitude, LOCATION_DECIMAL_PLACE)).build();
     }
 
     private APIGatewayProxyResponseEvent initializeAPIGatewayProxyResponse() {
